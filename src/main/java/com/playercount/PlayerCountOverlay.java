@@ -7,6 +7,8 @@ import java.util.List;
 import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
+import net.runelite.api.WorldType;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.PanelComponent;
@@ -25,6 +27,17 @@ class PlayerCountOverlay extends Overlay
         this.client = client;
     }
 
+    private boolean isPvpWorld()
+    {
+        return client.getWorldType().contains(WorldType.PVP);
+    }
+
+    private boolean isInWilderness(Player player)
+    {
+        WorldPoint wp = player.getWorldLocation();
+        return wp.getY() > 3520 && wp.getY() < 4000; // 4000 is the northern edge
+    }
+
     @Override
     public Dimension render(Graphics2D graphics)
     {
@@ -36,6 +49,7 @@ class PlayerCountOverlay extends Overlay
 
         long playerCount = players.stream()
                 .filter(p -> p != null && !p.equals(local)) // exclude yourself
+                .filter(p -> !isInWilderness(p))
                 .count();
 
         // Build overlay title
@@ -52,7 +66,7 @@ class PlayerCountOverlay extends Overlay
         // Add a line on the overlay for world number
         panelComponent.getChildren().add(LineComponent.builder()
                 .left("Number:")
-                .right(Long.toString(playerCount))
+                .right(isInWilderness(local) || isPvpWorld() ? "N/A" : Long.toString(playerCount))
                 .build());
 
         return panelComponent.render(graphics);
