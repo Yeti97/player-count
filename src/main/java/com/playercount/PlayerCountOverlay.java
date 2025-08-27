@@ -35,7 +35,7 @@ class PlayerCountOverlay extends Overlay
     private boolean isInWilderness(Player player)
     {
         WorldPoint wp = player.getWorldLocation();
-        return wp.getY() > 3520 && wp.getY() < 4000; // 4000 is the northern edge
+        return wp.getY() > 3584 && wp.getY() < 3967 && wp.getX() > 2944 && wp.getX() < 3391;
     }
 
     @Override
